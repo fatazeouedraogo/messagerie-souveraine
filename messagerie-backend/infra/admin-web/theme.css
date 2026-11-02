@@ -1,0 +1,76 @@
+/* ===== Thème Burkina : vert profond, or, rouge ===== */
+:root {
+  --paper: #f6f2e8; --surface: #fffdf8; --ink: #14221a; --muted: #5f6b62;
+  --line: #e3dccb; --line-strong: #c9bfa6;
+  --green: #0f6b43; --green-ink: #0a4a2e; --green-tint: #e5f1e9;
+  --red: #b3261e; --red-tint: #f8e4e1;
+  --gold: #c8a03a; --gold-soft: #f3e7c3;
+  --shadow-sm: 0 1px 2px rgba(20,34,26,.06), 0 4px 14px rgba(20,34,26,.06);
+  --shadow-md: 0 10px 30px rgba(20,34,26,.12);
+}
+body {
+  background:
+    radial-gradient(1200px 500px at 85% -10%, rgba(200,160,58,.14), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(15,107,67,.10), transparent 60%),
+    var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+.flagbar { background: linear-gradient(90deg, #b3261e 0 33.3%, #c8a03a 33.3% 66.6%, #0f6b43 66.6% 100%); }
+
+/* en-tête et navigation */
+.top { background: rgba(255,253,248,.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); box-shadow: 0 1px 0 var(--gold-soft), var(--shadow-sm); }
+.brand b { font-family: Georgia, "Palatino Linotype", serif; letter-spacing: .01em; color: var(--green-ink); }
+.rail a { border-radius: 0 12px 12px 0; transition: background .18s, transform .18s; }
+.rail a:hover { background: var(--green-tint); }
+.rail a.active { background: linear-gradient(90deg, var(--green-tint), transparent); border-left-color: var(--gold); font-weight: 700; color: var(--green-ink); }
+@media (max-width: 860px) { .rail a { border-radius: 12px; } .rail a.active { background: var(--green-tint); } }
+
+/* titres */
+h1, h2 { font-family: Georgia, "Palatino Linotype", serif; color: var(--green-ink); letter-spacing: -.01em; }
+h1::after { content: ""; display: block; width: 56px; height: 3px; margin-top: 10px; border-radius: 3px; background: linear-gradient(90deg, var(--gold), transparent); }
+
+/* chiffres clés */
+.figures { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.figure { transition: background .2s; }
+.figure:hover { background: var(--green-tint); }
+.figure .n { font-family: Georgia, "Palatino Linotype", serif; color: var(--green); }
+
+/* boutons et champs */
+.btn { border-radius: 10px; transition: transform .15s, box-shadow .15s, background .15s, border-color .15s; }
+.btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(15,107,67,.22); }
+.btn:not(:disabled):active { transform: translateY(0); box-shadow: none; }
+input, select, textarea { border-radius: 10px; transition: border-color .15s, box-shadow .15s; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: var(--green); box-shadow: 0 0 0 4px rgba(200,160,58,.30); }
+.btn:focus-visible { outline: 3px solid rgba(200,160,58,.55); outline-offset: 2px; }
+
+/* tableaux et listes */
+table { border-collapse: separate; border-spacing: 0; }
+tbody tr { transition: background .15s; }
+tbody tr:hover { background: var(--green-tint); }
+.levelcard { border-radius: 12px; transition: box-shadow .2s, border-color .2s, transform .2s; }
+.levelcard:hover:not(.off) { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.chip { background: var(--gold-soft); color: #5a4410; }
+
+/* fenêtres et notifications */
+dialog { border-radius: 18px; box-shadow: var(--shadow-md); }
+dialog.modal { border-radius: 18px; }
+dialog::backdrop { background: rgba(10,40,25,.55); backdrop-filter: blur(3px); }
+.panelhead { background: linear-gradient(180deg, var(--surface), var(--paper)); }
+.toast { border-radius: 12px; box-shadow: var(--shadow-md); }
+.cred { border-radius: 14px; border-color: var(--gold); background: linear-gradient(180deg, var(--surface), var(--gold-soft)); }
+
+/* page de connexion */
+.landing h1 { font-size: 52px; }
+.landing h1::after { width: 80px; height: 4px; }
+.eyebrow { color: var(--gold); letter-spacing: .18em; }
+.assure li { border-left-color: var(--gold); }
+.landing-box { border: 1px solid var(--line); border-top: 4px solid var(--gold); border-radius: 20px; box-shadow: var(--shadow-md); background: var(--surface); }
+
+/* animations discrètes */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .content > *, .landing > * { animation: fadeUp .45s ease-out both; }
+  .content > *:nth-child(2), .landing > *:nth-child(2) { animation-delay: .08s; }
+  .content > *:nth-child(3) { animation-delay: .16s; }
+  .content > *:nth-child(4) { animation-delay: .24s; }
+}

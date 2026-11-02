@@ -5,7 +5,7 @@ const String _envApi = String.fromEnvironment('API_BASE');
 const String _envIssuer = String.fromEnvironment('ISSUER');
 const String _envClient = String.fromEnvironment('CLIENT_ID');
 const String _envChat = String.fromEnvironment('CHAT_URL');
-const bool _envDemo = bool.fromEnvironment('DEMO', defaultValue: true);
+const bool _envDemo = bool.fromEnvironment('DEMO', defaultValue: false);
 
 class AppConfig {
   const AppConfig({

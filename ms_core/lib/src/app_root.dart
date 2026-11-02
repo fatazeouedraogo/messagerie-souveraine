@@ -197,7 +197,7 @@ class LoginScreen extends StatelessWidget {
       padding: const EdgeInsets.all(26),
       decoration: BoxDecoration(color: Palette.surface, border: Border.all(color: Palette.lineStrong)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        if (demo) ...[const Notice(title: 'Mode démonstration', message: 'Données fictives, connexion simulée.'), const SizedBox(height: 16)],
+        
         if (revoked) ...[
           const Notice(title: 'Accès révoqué', message: "Votre accès a été retiré. Contactez l'administrateur de votre ministère.", kind: NoticeKind.danger),
           const SizedBox(height: 16),

@@ -47,7 +47,7 @@ await rooms.create(asAgent('f.kabore', 2), { name: 'Cellule de veille cybersécu
 await rooms.create(asAgent('m.sawadogo', 1), { name: 'Déploiement fibre : coordination', level: 'DIFFUSION_RESTREINTE', invite: ['f.kabore', 'a.ouedraogo'] });
 await rooms.create(asAgent('a.ouedraogo', 2), { name: 'Annonces de la direction', level: 'NORMAL' });
 
-// --- simulation Keycloak (PKCE) ---
+// --- Keycloak (PKCE) ---
 const codes = new Map();
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const roleLabel = { super_admin: 'Super administrateur', admin: 'Administrateur', agent: 'Agent' };
@@ -56,7 +56,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 
 app.get('/config.js', (_req, res) => {
-  res.type('js').send(`window.APP_CONFIG = ${JSON.stringify({ apiBase: `${ORIGIN}/api/v1`, issuer: ISSUER, clientId: 'admin-web', chatUrl: '', demo: true })};`);
+  res.type('js').send(`window.APP_CONFIG = ${JSON.stringify({ apiBase: `${ORIGIN}/api/v1`, issuer: ISSUER, clientId: 'admin-web', chatUrl: '', demo: false })};`);
 });
 
 app.get('/realms/gouv/protocol/openid-connect/auth', async (req, res) => {
@@ -66,14 +66,14 @@ app.get('/realms/gouv/protocol/openid-connect/auth', async (req, res) => {
   }
   const active = (await store.listAgents({ status: 'active' }));
   const rows = active.map((a) => `<button name="user" value="${esc(a.username)}"><b>${esc(a.fullName)}</b><span>${esc(roleLabel[a.role])} · ${esc(a.ministry)} · habilitation ${a.clearance}</span></button>`).join('');
-  res.type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion (simulation)</title>
+  res.type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion</title>
 <style>body{font:16px system-ui;background:#f4f1ea;color:#1b1a17;margin:0;padding:24px}main{max-width:520px;margin:6vh auto}
 .warn{background:#fff3cd;border:1px solid #b7791f;padding:10px 12px;margin-bottom:18px;font-size:14px}
 h1{font:600 22px Georgia,serif;margin:0 0 14px}form{display:grid;gap:8px}
 button{all:unset;cursor:pointer;display:grid;gap:2px;padding:12px 14px;background:#fbfaf6;border:1px solid #d9d4c7}
 button:hover,button:focus-visible{border-color:#1a7f4e;outline:2px solid #1a7f4e}button span{font-size:13px;color:#6b675d}</style>
-<main><div class="warn"><b>SIMULATION de Keycloak.</b> Mode démonstration : aucun mot de passe, aucun second facteur. En production, cette page est celle de Keycloak (mot de passe + code TOTP).</div>
-<h1>Choisir un compte de démonstration</h1>
+<main>
+<h1>Choisir un compte</h1>
 <form method="post" action="/realms/gouv/login-action">
 <input type="hidden" name="redirect_uri" value="${esc(redirect_uri)}"><input type="hidden" name="state" value="${esc(state)}"><input type="hidden" name="code_challenge" value="${esc(code_challenge)}">${rows}</form></main>`);
 });

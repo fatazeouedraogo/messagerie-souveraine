@@ -25,7 +25,7 @@ function landing(message, { revoked = false } = {}) {
           h('li', {}, h('b', {}, 'Accès fermé.'), ' Seuls les agents enrôlés par leur ministère peuvent entrer.'),
           h('li', {}, h('b', {}, 'Révocable en un instant.'), ' Un agent qui part perd l\'accès partout.'))),
       h('div', { class: 'landing-box' },
-        cfg.demo ? h('div', { class: 'notice' }, icon('alert', 18), h('div', {}, h('b', {}, 'Mode démonstration'), h('p', {}, 'Données fictives, connexion simulée.'))) : null,
+        null,
         revoked
           ? h('div', { class: 'notice danger' }, icon('lock', 18), h('div', {}, h('b', {}, 'Accès révoqué'), h('p', {}, 'Votre accès a été retiré. Contactez l\'administrateur de votre ministère.')))
           : message ? h('div', { class: 'formerr', role: 'alert' }, h('strong', {}, message)) : null,
@@ -64,7 +64,7 @@ function shell(me, classifications) {
     flagbar(),
     h('div', { class: 'shell' },
       h('header', { class: 'top' },
-        h('div', { class: 'brand' }, mark(), h('div', {}, h('b', {}, 'Messagerie souveraine'), h('small', {}, cfg.demo ? 'Mode démonstration' : 'Administration publique'))),
+        h('div', { class: 'brand' }, mark(), h('div', {}, h('b', {}, 'Messagerie souveraine'), h('small', {}, 'Administration publique'))),
         h('div', { class: 'who' },
           h('span', { class: 'avatar', 'aria-hidden': 'true' }, initials(me.name)),
           h('div', { class: 'whotext' }, h('b', {}, me.name), h('small', {}, `${ROLE_LABEL[me.role]} · ${me.ministry ?? ''}`)),

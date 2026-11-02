@@ -81,7 +81,7 @@ class _TopBar extends StatelessWidget {
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
             Text('Messagerie souveraine', style: serif(17, height: 1.1)),
-            if (!compact) Text(session.config.demo ? 'Mode démonstration' : 'Administration publique', style: const TextStyle(fontSize: 12, color: Palette.muted)),
+            if (!compact) Text('Administration publique', style: const TextStyle(fontSize: 12, color: Palette.muted)),
           ]),
         ),
         InitialsAvatar(me.name),

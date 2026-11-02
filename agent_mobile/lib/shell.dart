@@ -33,7 +33,7 @@ class _AgentShellState extends State<AgentShell> {
               const BrandMark(),
               const SizedBox(width: 12),
               Expanded(child: Text(_titles[_index], style: serif(19, height: 1.1))),
-              if (widget.session.config.demo) const Text('DÉMO', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: Palette.amber)),
+              
               const SizedBox(width: 8),
             ]),
           ),
