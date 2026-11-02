@@ -15,6 +15,7 @@ android {
     }
 
     defaultConfig {
+        manifestPlaceholders["appAuthRedirectScheme"] = "bf.gov.messagerie"
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "bf.gov.agent_mobile"
         // You can update the following values to match your application needs.
