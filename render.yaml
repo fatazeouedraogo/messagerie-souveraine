@@ -2,7 +2,7 @@
   - type: web
     name: messagerie-api
     runtime: node
-    rootDir: messagerie-backend/api
-    buildCommand: npm install
-    startCommand: npm run demo
+    rootDir: messagerie-backend
+    buildCommand: cd api && npm install --include=dev
+    startCommand: cd api && DEMO_ORIGIN=$RENDER_EXTERNAL_URL npm run demo
     plan: free
