@@ -1,0 +1,27 @@
+{
+  "name": "messagerie-souveraine-api",
+  "version": "0.1.0",
+  "description": "API d'administration de la messagerie souveraine : enrôlement, révocation, salons classifiés, journal d'audit.",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test",
+    "demo": "node dev/demo-server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jose": "^5.9.6",
+    "pg": "^8.13.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "pg-mem": "^3.0.5"
+  }
+}

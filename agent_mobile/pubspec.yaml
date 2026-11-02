@@ -1,0 +1,26 @@
+name: agent_mobile
+description: Application mobile des agents de la messagerie souveraine (Flutter, Android et iOS).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  ms_core:
+    path: ../ms_core
+  http: ^1.2.2
+  flutter_appauth: ^8.0.0
+  flutter_secure_storage: ^9.2.2
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  # Polices embarquées : voir docs/FLUTTER.md (même bloc que admin_web).

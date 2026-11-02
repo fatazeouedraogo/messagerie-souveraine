@@ -1,0 +1,161 @@
+# Messagerie souveraine : installation en une commande -> ./scripts/install.sh
+# Services : PostgreSQL, Keycloak (identités + 2FA), Synapse (Matrix), Element (client web),
+# API d'administration, console d'administration, Nginx (point d'entrée unique).
+# Aucun service externe : toutes les images sont publiques et tournent sur le serveur.
+
+x-hardening: &hardening
+  security_opt: ["no-new-privileges:true"]
+  restart: unless-stopped
+
+services:
+  # Génère les fichiers de configuration à partir des modèles et du fichier .env.
+  render:
+    image: matrixdotorg/synapse:v1.120.0
+    entrypoint: ["python", "/render.py", "/templates", "/out"]
+    env_file: .env
+    volumes:
+      - ./infra/render.py:/render.py:ro
+      - ./infra/templates:/templates:ro
+      - ./generated:/out
+    restart: "no"
+
+  postgres:
+    <<: *hardening
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SYNAPSE_DB_PASSWORD: ${SYNAPSE_DB_PASSWORD}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      API_DB_PASSWORD: ${API_DB_PASSWORD}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  keycloak:
+    <<: *hardening
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_HOSTNAME: ${SCHEME}://auth.${DOMAIN}
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: kcadmin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      # Variables substituées dans realm-gouv.json à l'import
+      SCHEME: ${SCHEME}
+      DOMAIN: ${DOMAIN}
+      SYNAPSE_OIDC_SECRET: ${SYNAPSE_OIDC_SECRET}
+      ADMIN_API_CLIENT_SECRET: ${ADMIN_API_CLIENT_SECRET}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD}
+    volumes:
+      - ./infra/keycloak/realm-gouv.json:/opt/keycloak/data/import/realm-gouv.json:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - |
+          exec 3<>/dev/tcp/127.0.0.1/9000
+          echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3
+          grep -q '"status": "UP"' <&3
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+  synapse:
+    <<: *hardening
+    image: matrixdotorg/synapse:v1.120.0
+    environment:
+      SYNAPSE_CONFIG_PATH: /config/homeserver.yaml
+    volumes:
+      - synapse-data:/data
+      - ./generated:/config:ro
+    depends_on:
+      render: { condition: service_completed_successfully }
+      postgres: { condition: service_healthy }
+      keycloak: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "curl", "-fSs", "http://localhost:8008/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  element:
+    <<: *hardening
+    image: vectorim/element-web:v1.11.85
+    volumes:
+      - ./generated/element-config.json:/app/config.json:ro
+    depends_on:
+      render: { condition: service_completed_successfully }
+
+  api:
+    <<: *hardening
+    build: ./api
+    environment:
+      PORT: "3000"
+      DOMAIN: ${DOMAIN}
+      PUBLIC_SCHEME: ${SCHEME}
+      DATABASE_URL: postgres://adminapi:${API_DB_PASSWORD}@postgres:5432/adminapi
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: gouv
+      ADMIN_API_CLIENT_SECRET: ${ADMIN_API_CLIENT_SECRET}
+      SYNAPSE_URL: http://synapse:8008
+      SYNAPSE_REGISTRATION_SHARED_SECRET: ${SYNAPSE_REGISTRATION_SHARED_SECRET}
+      DEMO_SEED: ${DEMO_SEED:-false}
+      STATE_DIR: /state
+    volumes:
+      - api-state:/state
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: ["ALL"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      keycloak: { condition: service_healthy }
+      synapse: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  nginx:
+    <<: *hardening
+    image: nginx:1.27-alpine
+    command: ["nginx", "-c", "/gen/nginx.conf", "-g", "daemon off;"]
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      - ./generated:/gen:ro
+      - ./infra/admin-web:/srv/admin:ro
+    depends_on:
+      render: { condition: service_completed_successfully }
+    networks:
+      default:
+        # Les conteneurs joignent les noms publics par Nginx (ex. Synapse -> auth.<domaine>).
+        aliases:
+          - matrix.${DOMAIN}
+          - auth.${DOMAIN}
+          - chat.${DOMAIN}
+          - api.${DOMAIN}
+          - admin.${DOMAIN}
+
+volumes:
+  pg-data:
+  synapse-data:
+  api-state:

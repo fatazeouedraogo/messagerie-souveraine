@@ -1,0 +1,40 @@
+name: admin_web
+description: Console d'administration web de la messagerie souveraine (Flutter Web).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  ms_core:
+    path: ../ms_core
+  http: ^1.2.2
+  web: ^1.0.0
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Polices embarquées (rien n'est téléchargé à l'exécution). Voir docs/FLUTTER.md :
+  # déposez les fichiers dans assets/fonts/, décommentez ce bloc, puis compilez avec
+  # --dart-define=BUNDLED_FONTS=true
+  # fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Inter-Bold.ttf
+  #         weight: 700
+  #   - family: SourceSerif4
+  #     fonts:
+  #       - asset: assets/fonts/SourceSerif4-SemiBold.ttf
+  #         weight: 600

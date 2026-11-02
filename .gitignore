@@ -1,0 +1,9 @@
+node_modules/
+.env
+generated/
+mobile/
+build/
+.dart_tool/
+.idea/
+*.log
+.DS_Store
